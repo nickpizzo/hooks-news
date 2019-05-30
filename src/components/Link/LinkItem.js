@@ -41,13 +41,15 @@ function LinkItem({ link, index, showCount, history }) {
     <div className="flex items-start mt">
       <div className="flex items-center">
         {showCount && <span className="gray">{index}.</span>}
-        <div className="vote-button" onClick={handleVote}>
+        <div className="vote-button pointer" onClick={handleVote}>
           ▲
         </div>
       </div>
       <div className="ml1">
         <div>
-          {link.description}{" "}
+          <a href={link.url} className="black no-underline">
+            {link.description}
+          </a>{" "}
           <span className="link">({getDomain(link.url)})</span>
         </div>
         <div className="f6 lh-copy gray">
