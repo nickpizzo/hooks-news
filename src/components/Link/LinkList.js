@@ -5,14 +5,22 @@ import LinkItem from "./LinkItem";
 function LinkList(props) {
   const { firebase } = useContext(FirebaseContext);
   const [links, setLinks] = useState([]);
-  const isNewPage = props.location.pathname.includes("new");
+  // const isNewPage = props.location.pathname.includes("new");
+  const isTopPage = props.location.pathname.includes("top");
 
   useEffect(() => {
-    getLinks();
-  }, []);
+    const unsubscribe = getLinks();
+    return () => unsubscribe();
+  }, [isTopPage]);
 
   function getLinks() {
-    firebase.db
+    if (isTopPage) {
+      return firebase.db
+        .collection("links")
+        .orderBy("voteCount", "desc")
+        .onSnapshot(handleSnapshot);
+    }
+    return firebase.db
       .collection("links")
       .orderBy("created", "desc")
       .onSnapshot(handleSnapshot);
@@ -25,21 +33,9 @@ function LinkList(props) {
     setLinks(links);
   }
 
-  function renderLinks() {
-    if (isNewPage) {
-      return links;
-    }
-    //sorts links based on legth in desc order
-    //copy links array first with slice to avoid mutating it
-    const topLinks = links
-      .slice()
-      .sort((l1, l2) => l2.votes.length - l1.votes.length);
-    return topLinks;
-  }
-
   return (
     <div>
-      {renderLinks().map((link, index) => (
+      {links.map((link, index) => (
         <LinkItem
           key={link.id}
           showCount={true}
